@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Nullgen Privacy Policy</title>
+    <style>
+      :root {
+        --bg: #0d1014;
+        --text: #e8eef2;
+        --muted: #8b98a5;
+        --accent: #00d4b4;
+      }
+      body {
+        margin: 0;
+        font-family: "Segoe UI", system-ui, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+      }
+      main {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 3rem 1.25rem 4rem;
+      }
+      h1 {
+        letter-spacing: -0.03em;
+        margin-bottom: 0.25rem;
+      }
+      .meta {
+        color: var(--muted);
+        font-size: 0.9rem;
+        margin-bottom: 2rem;
+      }
+      h2 {
+        margin-top: 2rem;
+        font-size: 1.15rem;
+        color: var(--accent);
+      }
+      a {
+        color: var(--accent);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Nullgen Privacy Policy</h1>
+      <p class="meta">Last updated: September 4, 2026</p>
+
+      <p>
+        Nullgen is a browser extension that filters AI-related websites and on-page content
+        according to rules you control. This policy explains what data is involved and how it is
+        handled.
+      </p>
+
+      <h2>Data we collect</h2>
+      <p>
+        Nullgen does <strong>not</strong> sell user data, run ads, or send browsing history to a
+        Nullgen server. There is no Nullgen account and no remote analytics backend operated by us
+        for this extension.
+      </p>
+      <p>The extension stores the following locally in your browser (Chrome storage):</p>
+      <ul>
+        <li>Your settings (enabled categories, block lists, appearance preferences, allowlist)</li>
+        <li>Local counters for blocked items (elements, text, navigations)</li>
+      </ul>
+
+      <h2>Permissions</h2>
+      <ul>
+        <li>
+          <strong>storage</strong> — save your settings and stats on this device (and optional sync
+          of a small settings mirror if Chrome Sync is enabled).
+        </li>
+        <li>
+          <strong>declarativeNetRequest</strong> — block or redirect navigation to AI platforms you
+          have enabled in your rules.
+        </li>
+        <li>
+          <strong>tabs</strong> — support “Allow this site” and popup actions for the active tab.
+        </li>
+        <li>
+          <strong>Host access (&lt;all_urls&gt;)</strong> — scan page content so cosmetic filters,
+          keywords, and AI-text heuristics can run on websites you visit.
+        </li>
+      </ul>
+
+      <h2>How page data is used</h2>
+      <p>
+        Content scripts may read visible text and element structure in the active page only to decide
+        whether to hide or label matching AI-related content. That page content is processed on your
+        device and is not uploaded to Nullgen servers.
+      </p>
+
+      <h2>Sharing</h2>
+      <p>
+        We do not share extension data with third parties. If you use Chrome Sync, Google may sync
+        the small settings mirror according to Google’s own policies for Chrome Sync.
+      </p>
+
+      <h2>Children</h2>
+      <p>
+        Nullgen is not directed at children under 13. Do not use the extension if you are under 13.
+      </p>
+
+      <h2>Changes</h2>
+      <p>
+        We may update this policy when the extension’s data practices change. The “Last updated”
+        date at the top will change when we do.
+      </p>
+
+      <h2>Contact</h2>
+      <p>
+        Questions about privacy: open an issue on the
+        <a href="https://github.com/ErdTheTurd/ai-blocker">Nullgen GitHub repository</a>.
+      </p>
+    </main>
+  </body>
+</html>

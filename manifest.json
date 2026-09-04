@@ -3,6 +3,7 @@
   "name": "Nullgen",
   "version": "1.0.0",
   "description": "Block AI platforms, channels, widgets, and AI-written content — customizable like an ad blocker.",
+  "homepage_url": "https://github.com/ErdTheTurd/ai-blocker",
   "permissions": [
     "storage",
     "declarativeNetRequest",

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Blocked — Nullgen</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0d1014;
+        --surface: #161a20;
+        --accent: #00d4b4;
+        --text: #e8eef2;
+        --muted: #8b98a5;
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background:
+          radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 212, 180, 0.18), transparent),
+          radial-gradient(ellipse 60% 40% at 100% 100%, rgba(0, 80, 90, 0.25), transparent),
+          var(--bg);
+        color: var(--text);
+        font-family: "Space Grotesk", system-ui, sans-serif;
+        padding: 2rem;
+      }
+      .card {
+        width: min(480px, 100%);
+        text-align: center;
+      }
+      .mark {
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 1.5rem;
+        border: 3px solid var(--accent);
+        border-radius: 50%;
+        position: relative;
+      }
+      .mark::after {
+        content: "";
+        position: absolute;
+        inset: 45% -8%;
+        height: 3px;
+        background: var(--accent);
+        transform: rotate(-45deg);
+      }
+      h1 {
+        font-size: clamp(1.75rem, 4vw, 2.25rem);
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        margin-bottom: 0.5rem;
+      }
+      .brand {
+        color: var(--accent);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.85rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        margin-bottom: 1rem;
+      }
+      p {
+        color: var(--muted);
+        line-height: 1.55;
+        margin-bottom: 1.75rem;
+      }
+      .host {
+        font-family: "JetBrains Mono", monospace;
+        color: var(--text);
+        background: var(--surface);
+        padding: 0.65rem 1rem;
+        border-radius: 8px;
+        border: 1px solid rgba(0, 212, 180, 0.2);
+        word-break: break-all;
+        margin-bottom: 1.75rem;
+        font-size: 0.9rem;
+      }
+      .actions {
+        display: flex;
+        gap: 0.75rem;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      button, a.btn {
+        appearance: none;
+        border: none;
+        cursor: pointer;
+        font: inherit;
+        padding: 0.7rem 1.15rem;
+        border-radius: 8px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+      }
+      .primary {
+        background: var(--accent);
+        color: #041412;
+        font-weight: 600;
+      }
+      .ghost {
+        background: transparent;
+        color: var(--muted);
+        border: 1px solid rgba(139, 152, 165, 0.35);
+      }
+    </style>
+  </head>
+  <body>
+    <main class="card">
+      <div class="mark" aria-hidden="true"></div>
+      <div class="brand">Nullgen</div>
+      <h1>Signal cut</h1>
+      <p>This destination is on your AI platform block list.</p>
+      <div class="host" id="host">—</div>
+      <div class="actions">
+        <button type="button" class="primary" id="allowOnce">Allow this site</button>
+        <a class="btn ghost" id="options" href="#">Customize rules</a>
+      </div>
+    </main>
+    <script type="module">
+      const params = new URLSearchParams(location.search);
+      let host = params.get("host") || "AI platform";
+      const label = params.get("label");
+      try {
+        if (host.includes("/")) host = host.split("/")[0];
+      } catch {}
+      document.getElementById("host").textContent = label
+        ? `${label} (${host})`
+        : host;
+
+      document.getElementById("options").addEventListener("click", (e) => {
+        e.preventDefault();
+        chrome.runtime.openOptionsPage();
+      });
+
+      document.getElementById("allowOnce").addEventListener("click", async () => {
+        const { settings } =
+          (await chrome.runtime.sendMessage({ type: "GET_SETTINGS" })) || {};
+        if (!settings) return;
+        const clean = host.replace(/^www\./, "");
+        if (clean && clean !== "AI platform" && !settings.allowlist.includes(clean)) {
+          settings.allowlist.push(clean);
+          for (const p of settings.platforms) {
+            if (p.host.split("/")[0].replace(/^www\./, "") === clean) p.enabled = false;
+          }
+          await chrome.storage.local.set({ settings });
+          await chrome.runtime.sendMessage({ type: "REBUILD_RULES" });
+        }
+        history.length > 1 ? history.back() : (location.href = "about:blank");
+      });
+
+      // Count blocked navigation once per load
+      chrome.runtime.sendMessage({ type: "BUMP_STAT", key: "blockedNavigations", by: 1 });
+    </script>
+  </body>
+</html>

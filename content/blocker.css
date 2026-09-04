@@ -1,0 +1,143 @@
+:root {
+  --nullgen-accent: #00d4b4;
+  --nullgen-surface: #161a20;
+  --nullgen-text: #e8eef2;
+  --nullgen-muted: #8b98a5;
+  --nullgen-radius: 8px;
+  --nullgen-font: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.nullgen-hidden {
+  display: none !important;
+}
+
+.nullgen-blocked {
+  position: relative !important;
+  overflow: hidden !important;
+  isolation: isolate;
+}
+
+.nullgen-blocked.nullgen-mode-blank {
+  visibility: hidden !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+}
+
+.nullgen-blocked.nullgen-mode-blur > *:not(.nullgen-placeholder) {
+  filter: blur(10px) saturate(0.4) !important;
+  user-select: none !important;
+  pointer-events: none !important;
+}
+
+.nullgen-blocked.nullgen-mode-label > *:not(.nullgen-placeholder),
+.nullgen-blocked.nullgen-mode-custom > *:not(.nullgen-placeholder) {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  user-select: none !important;
+}
+
+.nullgen-placeholder {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 2147483646 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  padding: 0.75rem 1rem !important;
+  background: color-mix(in srgb, var(--nullgen-surface) 92%, transparent) !important;
+  color: var(--nullgen-text) !important;
+  font-family: var(--nullgen-font) !important;
+  font-size: 0.85rem !important;
+  letter-spacing: 0.02em !important;
+  border-radius: var(--nullgen-radius) !important;
+  border: 1px solid color-mix(in srgb, var(--nullgen-accent) 35%, transparent) !important;
+  box-sizing: border-box !important;
+  pointer-events: auto !important;
+  gap: 0.5rem !important;
+  flex-direction: column !important;
+}
+
+.nullgen-placeholder .nullgen-mark {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--nullgen-accent);
+  border-radius: 50%;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.nullgen-placeholder .nullgen-mark::after {
+  content: "";
+  position: absolute;
+  left: -20%;
+  right: -20%;
+  top: 45%;
+  height: 2px;
+  background: var(--nullgen-accent);
+  transform: rotate(-45deg);
+}
+
+.nullgen-placeholder strong {
+  color: var(--nullgen-accent);
+  font-weight: 600;
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.nullgen-placeholder span {
+  color: var(--nullgen-muted);
+  max-width: 28rem;
+  line-height: 1.4;
+}
+
+.nullgen-placeholder button {
+  appearance: none;
+  border: 1px solid color-mix(in srgb, var(--nullgen-accent) 45%, transparent);
+  background: transparent;
+  color: var(--nullgen-accent);
+  font: inherit;
+  font-size: 0.75rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: calc(var(--nullgen-radius) - 2px);
+  cursor: pointer;
+  margin-top: 0.25rem;
+}
+
+.nullgen-placeholder button:hover {
+  background: color-mix(in srgb, var(--nullgen-accent) 15%, transparent);
+}
+
+/* Inline text strike-through for keyword hits inside paragraphs */
+.nullgen-text-hit {
+  background: color-mix(in srgb, var(--nullgen-accent) 12%, transparent) !important;
+  outline: 1px dashed color-mix(in srgb, var(--nullgen-accent) 40%, transparent);
+  border-radius: 2px;
+}
+
+.nullgen-toast {
+  position: fixed !important;
+  right: 16px !important;
+  bottom: 16px !important;
+  z-index: 2147483647 !important;
+  background: var(--nullgen-surface) !important;
+  color: var(--nullgen-text) !important;
+  border: 1px solid color-mix(in srgb, var(--nullgen-accent) 40%, transparent) !important;
+  border-radius: var(--nullgen-radius) !important;
+  padding: 0.65rem 0.9rem !important;
+  font-family: var(--nullgen-font) !important;
+  font-size: 0.8rem !important;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35) !important;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  pointer-events: none;
+}
+
+.nullgen-toast.nullgen-toast-show {
+  opacity: 1;
+  transform: translateY(0);
+}

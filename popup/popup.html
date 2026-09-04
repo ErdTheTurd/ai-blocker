@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Nullgen</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header class="head">
+      <div class="brand">
+        <span class="logo" aria-hidden="true"></span>
+        <div>
+          <strong>Nullgen</strong>
+          <span class="tag">AI signal filter</span>
+        </div>
+      </div>
+      <label class="switch" title="Master toggle">
+        <input type="checkbox" id="enabled" />
+        <span class="slider"></span>
+      </label>
+    </header>
+
+    <section class="stats">
+      <div>
+        <span class="num" id="stat-elements">0</span>
+        <span class="lbl">elements</span>
+      </div>
+      <div>
+        <span class="num" id="stat-text">0</span>
+        <span class="lbl">text</span>
+      </div>
+      <div>
+        <span class="num" id="stat-nav">0</span>
+        <span class="lbl">sites</span>
+      </div>
+    </section>
+
+    <section class="cats" id="categories"></section>
+
+    <footer class="foot">
+      <button type="button" class="link" id="allow-site">Allow this site</button>
+      <button type="button" class="link primary" id="open-options">Customize</button>
+    </footer>
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

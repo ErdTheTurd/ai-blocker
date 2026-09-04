@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Nullgen — Customize</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="nav">
+        <div class="brand">
+          <span class="logo" aria-hidden="true"></span>
+          <div>
+            <strong>Nullgen</strong>
+            <em>Customize everything</em>
+          </div>
+        </div>
+        <nav>
+          <button type="button" class="nav-btn active" data-panel="appearance">Appearance</button>
+          <button type="button" class="nav-btn" data-panel="platforms">Platforms</button>
+          <button type="button" class="nav-btn" data-panel="channels">Channels</button>
+          <button type="button" class="nav-btn" data-panel="selectors">Selectors</button>
+          <button type="button" class="nav-btn" data-panel="keywords">Keywords</button>
+          <button type="button" class="nav-btn" data-panel="aitext">AI text</button>
+          <button type="button" class="nav-btn" data-panel="images">Images</button>
+          <button type="button" class="nav-btn" data-panel="allowlist">Allowlist</button>
+          <button type="button" class="nav-btn" data-panel="data">Import / Export</button>
+        </nav>
+        <p class="aside-note">Changes save automatically.</p>
+      </aside>
+
+      <main>
+        <header class="top">
+          <div>
+            <h1 id="panel-title">Appearance</h1>
+            <p id="panel-desc">How blocked content looks across the web.</p>
+          </div>
+          <label class="switch lg">
+            <input type="checkbox" id="master-enabled" />
+            <span class="slider"></span>
+            <span class="switch-label">Enabled</span>
+          </label>
+        </header>
+
+        <!-- Appearance -->
+        <section class="panel active" id="panel-appearance">
+          <div class="grid-2">
+            <div class="field">
+              <label>Theme</label>
+              <div class="theme-picks" id="theme-picks">
+                <button type="button" data-theme="signal" class="theme-card">
+                  <span class="swatch signal"></span>Signal
+                </button>
+                <button type="button" data-theme="paper" class="theme-card">
+                  <span class="swatch paper"></span>Paper
+                </button>
+                <button type="button" data-theme="terminal" class="theme-card">
+                  <span class="swatch terminal"></span>Terminal
+                </button>
+                <button type="button" data-theme="custom" class="theme-card">
+                  <span class="swatch custom"></span>Custom
+                </button>
+              </div>
+            </div>
+            <div class="field">
+              <label>Placeholder style</label>
+              <select id="placeholder-mode">
+                <option value="label">Labeled cover</option>
+                <option value="custom">Custom message</option>
+                <option value="blur">Blur content</option>
+                <option value="blank">Remove entirely</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Custom message</label>
+              <input type="text" id="custom-message" placeholder="Blocked by Nullgen" />
+            </div>
+            <div class="field">
+              <label>UI font</label>
+              <select id="font-select">
+                <option value="space">Space Grotesk</option>
+                <option value="plex">IBM Plex Sans</option>
+                <option value="jetbrains">JetBrains Mono</option>
+                <option value="system">System</option>
+              </select>
+            </div>
+            <div class="field" id="custom-colors">
+              <label>Custom colors</label>
+              <div class="color-row">
+                <label>Accent <input type="color" id="color-accent" /></label>
+                <label>Surface <input type="color" id="color-surface" /></label>
+                <label>Text <input type="color" id="color-text" /></label>
+              </div>
+            </div>
+            <div class="field">
+              <label>Corner radius <span id="radius-val">8px</span></label>
+              <input type="range" id="border-radius" min="0" max="24" step="1" />
+            </div>
+          </div>
+          <div class="field">
+            <label class="check">
+              <input type="checkbox" id="show-badge" />
+              Show on-page block toast
+            </label>
+          </div>
+          <div class="field">
+            <label>Custom CSS (injected on pages)</label>
+            <textarea id="custom-css" rows="6" placeholder=".nullgen-placeholder { /* your styles */ }"></textarea>
+          </div>
+          <div class="preview" id="appearance-preview">
+            <div class="nullgen-placeholder demo">
+              <div class="nullgen-mark"></div>
+              <strong>Nullgen</strong>
+              <span id="preview-msg">AI content blocked</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Platforms -->
+        <section class="panel" id="panel-platforms">
+          <div class="toolbar">
+            <input type="text" id="platform-filter" placeholder="Filter platforms…" />
+            <button type="button" class="btn" id="add-platform">Add platform</button>
+          </div>
+          <div class="list" id="platform-list"></div>
+        </section>
+
+        <!-- Channels -->
+        <section class="panel" id="panel-channels">
+          <p class="hint">
+            Block creators by handle or ID. YouTube supports @handles; X/Twitter uses usernames; custom
+            accepts a regex matched against the page URL.
+          </p>
+          <div class="tabs" id="channel-tabs">
+            <button type="button" class="tab active" data-ch="youtube">YouTube</button>
+            <button type="button" class="tab" data-ch="twitter">X / Twitter</button>
+            <button type="button" class="tab" data-ch="twitch">Twitch</button>
+            <button type="button" class="tab" data-ch="custom">Custom regex</button>
+          </div>
+          <div class="toolbar">
+            <input type="text" id="channel-input" placeholder="@handle or channel id" />
+            <input type="text" id="channel-label" placeholder="Label (optional)" />
+            <button type="button" class="btn" id="add-channel">Add</button>
+          </div>
+          <div class="list" id="channel-list"></div>
+        </section>
+
+        <!-- Selectors -->
+        <section class="panel" id="panel-selectors">
+          <p class="hint">CSS selectors hide matching elements on every page — like cosmetic ad-block filters.</p>
+          <div class="toolbar">
+            <input type="text" id="selector-input" placeholder=".ai-badge, [data-generated]" />
+            <input type="text" id="selector-label" placeholder="Label" />
+            <button type="button" class="btn" id="add-selector">Add</button>
+          </div>
+          <div class="list" id="selector-list"></div>
+        </section>
+
+        <!-- Keywords -->
+        <section class="panel" id="panel-keywords">
+          <p class="hint">Regex patterns. Matching text blocks the nearest article, comment, or paragraph.</p>
+          <div class="toolbar">
+            <input type="text" id="keyword-input" placeholder="AI[- ]generated" />
+            <input type="text" id="keyword-label" placeholder="Label" />
+            <button type="button" class="btn" id="add-keyword">Add</button>
+          </div>
+          <div class="list" id="keyword-list"></div>
+        </section>
+
+        <!-- AI text -->
+        <section class="panel" id="panel-aitext">
+          <div class="grid-2">
+            <div class="field">
+              <label class="check">
+                <input type="checkbox" id="aitext-enabled" />
+                Detect likely AI-written text
+              </label>
+            </div>
+            <div class="field">
+              <label>Sensitivity</label>
+              <select id="aitext-sensitivity">
+                <option value="low">Low — fewer false positives</option>
+                <option value="balanced">Balanced</option>
+                <option value="high">High — catch more</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Minimum length <span id="minlen-val">280</span></label>
+              <input type="range" id="aitext-minlen" min="80" max="800" step="20" />
+            </div>
+            <div class="field">
+              <label class="check">
+                <input type="checkbox" id="aitext-phrases" />
+                Score common AI phrases
+              </label>
+              <label class="check">
+                <input type="checkbox" id="aitext-structure" />
+                Score structural patterns
+              </label>
+            </div>
+          </div>
+          <div class="field">
+            <label>Custom phrases (one per line)</label>
+            <textarea id="aitext-custom" rows="8"></textarea>
+          </div>
+        </section>
+
+        <!-- Images -->
+        <section class="panel" id="panel-images">
+          <div class="field">
+            <label class="check">
+              <input type="checkbox" id="images-enabled" />
+              Block AI images
+            </label>
+            <label class="check">
+              <input type="checkbox" id="images-alt" />
+              Match AI alt text
+            </label>
+            <label class="check">
+              <input type="checkbox" id="images-cdn" />
+              Block known AI CDNs
+            </label>
+          </div>
+          <div class="field">
+            <label>CDN host patterns (one per line)</label>
+            <textarea id="images-cdns" rows="6"></textarea>
+          </div>
+        </section>
+
+        <!-- Allowlist -->
+        <section class="panel" id="panel-allowlist">
+          <p class="hint">Sites here skip all Nullgen filtering.</p>
+          <div class="toolbar">
+            <input type="text" id="allow-input" placeholder="example.com" />
+            <button type="button" class="btn" id="add-allow">Allow</button>
+          </div>
+          <div class="list" id="allow-list"></div>
+        </section>
+
+        <!-- Data -->
+        <section class="panel" id="panel-data">
+          <div class="actions-row">
+            <button type="button" class="btn" id="export-settings">Export JSON</button>
+            <button type="button" class="btn" id="import-settings">Import JSON</button>
+            <button type="button" class="btn danger" id="reset-settings">Reset to defaults</button>
+            <button type="button" class="btn ghost" id="reset-stats">Reset stats</button>
+          </div>
+          <input type="file" id="import-file" accept="application/json,.json" hidden />
+          <pre class="code" id="export-preview"></pre>
+        </section>
+      </main>
+    </div>
+    <script type="module" src="options.js"></script>
+  </body>
+</html>

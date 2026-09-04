@@ -35,9 +35,9 @@ export async function rebuildNetworkRules(settings) {
     const hostKey = platform.host.split("/")[0].replace(/^www\./, "").toLowerCase();
     if (allow.has(hostKey)) continue;
 
-    const blockedUrl = chrome.runtime.getURL(
-      `assets/blocked.html?host=${encodeURIComponent(platform.host)}&label=${encodeURIComponent(platform.label || platform.host)}`
-    );
+    const blockedUrl =
+      chrome.runtime.getURL("assets/blocked.html") +
+      `#host=${encodeURIComponent(platform.host)}&label=${encodeURIComponent(platform.label || platform.host)}`;
 
     rules.push({
       id: id++,

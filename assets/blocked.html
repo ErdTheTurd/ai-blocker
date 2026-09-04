@@ -123,40 +123,6 @@
         <a class="btn ghost" id="options" href="#">Customize rules</a>
       </div>
     </main>
-    <script type="module">
-      const params = new URLSearchParams(location.search);
-      let host = params.get("host") || "AI platform";
-      const label = params.get("label");
-      try {
-        if (host.includes("/")) host = host.split("/")[0];
-      } catch {}
-      document.getElementById("host").textContent = label
-        ? `${label} (${host})`
-        : host;
-
-      document.getElementById("options").addEventListener("click", (e) => {
-        e.preventDefault();
-        chrome.runtime.openOptionsPage();
-      });
-
-      document.getElementById("allowOnce").addEventListener("click", async () => {
-        const { settings } =
-          (await chrome.runtime.sendMessage({ type: "GET_SETTINGS" })) || {};
-        if (!settings) return;
-        const clean = host.replace(/^www\./, "");
-        if (clean && clean !== "AI platform" && !settings.allowlist.includes(clean)) {
-          settings.allowlist.push(clean);
-          for (const p of settings.platforms) {
-            if (p.host.split("/")[0].replace(/^www\./, "") === clean) p.enabled = false;
-          }
-          await chrome.storage.local.set({ settings });
-          await chrome.runtime.sendMessage({ type: "REBUILD_RULES" });
-        }
-        history.length > 1 ? history.back() : (location.href = "about:blank");
-      });
-
-      // Count blocked navigation once per load
-      chrome.runtime.sendMessage({ type: "BUMP_STAT", key: "blockedNavigations", by: 1 });
-    </script>
+    <script src="blocked.js"></script>
   </body>
 </html>

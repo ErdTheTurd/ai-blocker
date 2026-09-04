@@ -1,0 +1,24 @@
+Name: Nullgen
+Short description: Block AI platforms, channels, widgets, and AI-written content — customizable like an ad blocker.
+Category: Productivity
+Language: English
+Visibility: Public
+Regions: All regions
+
+Detailed description:
+Nullgen filters AI noise from the web the way an ad blocker filters ads.
+
+• Block AI platforms (ChatGPT, Claude, Gemini, Midjourney, and more)
+• Hide creators/channels you list on YouTube, X, and Twitch
+• Cosmetic filters for AI badges, sidebars, and embeds
+• Keyword and AI-text heuristics for generated copy
+• AI image CDN / alt-text matching
+• Fully customizable appearance and rule lists
+• Allowlist any site in one click
+• Import / export your configuration
+
+All filtering runs in your browser. Nullgen does not sell your data.
+
+Privacy policy: privacy.html (host via GitHub Pages after merge)
+Screenshots: store/screenshots/
+Promo: store/promo/

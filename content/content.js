@@ -39,8 +39,32 @@
     }
   }
 
+  function isAiToolHost() {
+    const host = hostname();
+    const tools = [
+      "claude.ai",
+      "anthropic.com",
+      "chatgpt.com",
+      "chat.openai.com",
+      "openai.com",
+      "gemini.google.com",
+      "bard.google.com",
+      "copilot.microsoft.com",
+      "perplexity.ai",
+      "character.ai",
+      "poe.com",
+      "grok.x.ai",
+      "x.ai",
+      "midjourney.com",
+      "sora.com",
+      "huggingface.co"
+    ];
+    return tools.some((t) => host === t || host.endsWith("." + t));
+  }
+
   function isAllowlisted() {
     const host = hostname();
+    if (isAiToolHost()) return true; // never filter inside AI apps you intentionally open
     return (settings.allowlist || []).some((h) => {
       const n = String(h).replace(/^www\./, "").toLowerCase();
       return host === n || host.endsWith("." + n);
@@ -281,26 +305,61 @@
   }
 
   /* ——— Videos (YouTube-first, works on other video sites too) ——— */
+  const YT_BUILTIN_PATTERNS = [
+    /AI[- ]generated/i,
+    /made (with|by|using) (AI|ChatGPT|Sora|Midjourney|Runway|Pika|Kling|Luma|Veo)/i,
+    /(^|[^a-z0-9])AI([^a-z0-9]|$)/i,
+    /\bA\.I\.\b/i,
+    /\b(ChatGPT|Midjourney|Sora|ElevenLabs|Synthesia|HeyGen|Runway|Pika|Kling|Veo|Suno|Udio)\b/i,
+    /#ai\b|#aivideo\b|#aiart\b|#aianimation\b/i,
+    /generative AI|gen[- ]?AI|text[- ]to[- ]video|text[- ]to[- ]image/i,
+    /AI (video|film|movie|animation|short|cover|voice|song|music|art|clip|trailer)/i,
+    /100% AI|fully AI|entirely AI|completely AI/i
+  ];
+
   function videoTitlePatterns() {
-    return (settings.videos?.titlePatterns || [])
+    const custom = (settings.videos?.titlePatterns || [])
       .filter((p) => p.enabled && p.pattern)
       .map((p) => {
         try {
-          return { rule: p, re: new RegExp(p.pattern, "i") };
+          return { label: p.label || p.pattern, re: new RegExp(p.pattern, "i") };
         } catch {
           return null;
         }
       })
       .filter(Boolean);
+
+    const builtin = YT_BUILTIN_PATTERNS.map((re, i) => ({
+      label: "AI video signal",
+      re
+    }));
+    return custom.concat(builtin);
   }
 
   function textMatchesVideoAi(text, patterns) {
-    if (!text) return null;
-    for (const { rule, re } of patterns) {
+    if (!text || !String(text).trim()) return null;
+    const sample = String(text);
+    for (const { label, re } of patterns) {
       re.lastIndex = 0;
-      if (re.test(text)) return rule.label || rule.pattern;
+      if (re.test(sample)) return label;
     }
     return null;
+  }
+
+  function collectYtCardText(card) {
+    const bits = [];
+    const push = (v) => {
+      if (v && typeof v === "string" && v.trim()) bits.push(v.trim());
+    };
+    push(card.getAttribute?.("aria-label"));
+    card.querySelectorAll?.(
+      "a#video-title, a#video-title-link, #video-title, yt-formatted-string, a[href*='/watch'], a[href*='/shorts/'], #text, #description-text, #subtitle"
+    ).forEach((el) => {
+      push(el.getAttribute("aria-label"));
+      push(el.getAttribute("title"));
+      push(el.textContent);
+    });
+    return bits.join(" \n ").slice(0, 1200);
   }
 
   function scanYouTubeVideos() {
@@ -314,62 +373,61 @@
       return;
     }
 
-    // Feed / search / related / home cards
+    // Primary: every watch/shorts link (YouTube puts full titles in aria-label/title)
     if (v.blockFeedCards !== false) {
-      const cards = document.querySelectorAll(
-        [
-          "ytd-rich-item-renderer",
-          "ytd-video-renderer",
-          "ytd-grid-video-renderer",
-          "ytd-compact-video-renderer",
-          "ytd-playlist-panel-video-renderer",
-          "ytd-reel-item-renderer",
-          "ytd-rich-grid-media",
-          "ytm-rich-item-renderer",
-          "ytm-video-with-context-renderer"
-        ].join(", ")
-      );
-      cards.forEach((card) => {
-        if (card.classList.contains("nullgen-blocked")) return;
-        const titleEl =
-          card.querySelector(
-            "#video-title, #video-title-link, a#video-title, h3, .title, yt-formatted-string#video-title"
-          ) || card;
+      document.querySelectorAll("a[href*='/watch'], a[href*='/shorts/']").forEach((a) => {
+        if (a.closest(".nullgen-blocked, .nullgen-placeholder")) return;
         const meta = [
-          titleEl.getAttribute("title"),
-          titleEl.getAttribute("aria-label"),
-          titleEl.textContent,
-          card.querySelector("#description-text, #subtitle, #metadata")?.textContent
+          a.getAttribute("aria-label"),
+          a.getAttribute("title"),
+          a.textContent
         ]
           .filter(Boolean)
           .join(" \n ");
         const hit = textMatchesVideoAi(meta, patterns);
-        if (hit) markBlocked(card, `YouTube: ${hit}`);
+        if (!hit) return;
+        const card = youtubeCardFrom(a);
+        // Prefer locking the whole tile when possible
+        const tile =
+          a.closest(
+            "ytd-rich-item-renderer, ytd-video-renderer, ytd-grid-video-renderer, ytd-compact-video-renderer, ytd-reel-item-renderer, ytm-rich-item-renderer"
+          ) || card;
+        markBlocked(tile, `YouTube: ${hit}`);
       });
+
+      // Secondary: rich item tiles that may not expose a simple watch link yet
+      document
+        .querySelectorAll(
+          "ytd-rich-item-renderer, ytd-video-renderer, ytd-grid-video-renderer, ytd-compact-video-renderer, ytd-reel-item-renderer, ytd-playlist-panel-video-renderer, ytm-rich-item-renderer"
+        )
+        .forEach((card) => {
+          if (card.classList.contains("nullgen-blocked")) return;
+          const hit = textMatchesVideoAi(collectYtCardText(card), patterns);
+          if (hit) markBlocked(card, `YouTube: ${hit}`);
+        });
     }
 
     // Shorts shelf / player
     if (v.blockShorts !== false) {
       document
         .querySelectorAll(
-          "ytd-reel-video-renderer, ytd-shorts, shorts-video-renderer, ytd-player[is-shorts]"
+          "ytd-reel-video-renderer, ytd-shorts, ytd-reel-item-renderer, shorts-video-renderer"
         )
         .forEach((el) => {
-          const meta = (
-            el.getAttribute("aria-label") ||
-            el.querySelector("h2, #video-title, .title")?.textContent ||
-            document.title ||
-            ""
-          ).trim();
+          if (el.classList.contains("nullgen-blocked")) return;
+          const meta = collectYtCardText(el) || document.title;
           const hit = textMatchesVideoAi(meta, patterns);
-          if (hit) markBlocked(el.closest("ytd-reel-video-renderer, ytd-shorts") || el, `Shorts: ${hit}`);
+          if (hit) markBlocked(el, `Shorts: ${hit}`);
         });
 
       if (/\/shorts\//i.test(location.pathname)) {
-        const hit = textMatchesVideoAi(document.title + " " + (document.body?.innerText || "").slice(0, 2000), patterns);
+        const hit = textMatchesVideoAi(
+          document.title + " " + (document.querySelector("h2, #video-title, yt-formatted-string")?.textContent || ""),
+          patterns
+        );
         if (hit) {
           const player =
-            document.querySelector("#shorts-player, ytd-reel-video-renderer, #player") ||
+            document.querySelector("#shorts-player, ytd-reel-video-renderer, #player-container") ||
             document.querySelector("ytd-app") ||
             document.body;
           markBlocked(player, `Shorts: ${hit}`);
@@ -377,28 +435,32 @@
       }
     }
 
-    // Watch page — block the main player/watch layout when the current video matches
+    // Watch page
     if (v.blockWatchPage !== false && (/\/watch/.test(location.pathname) || host === "youtu.be")) {
       const title =
         document.querySelector(
-          "h1.ytd-watch-metadata yt-formatted-string, h1 yt-formatted-string, #title h1, ytd-watch-metadata #title"
+          "h1.ytd-watch-metadata yt-formatted-string, ytd-watch-metadata h1, #title h1 yt-formatted-string, #title h1"
         )?.textContent ||
+        document.querySelector('meta[property="og:title"]')?.content ||
         document.querySelector('meta[name="title"]')?.content ||
         document.title.replace(/ - YouTube$/i, "");
       const desc =
         document.querySelector(
-          "#description-inline-expander, #description, ytd-expander#description, #info-container"
-        )?.innerText || "";
+          "#description-inline-expander, ytd-text-inline-expander, #description, ytd-expander#description"
+        )?.innerText ||
+        document.querySelector('meta[name="description"]')?.content ||
+        "";
       const channel =
         document.querySelector(
-          "ytd-channel-name #text, #owner #channel-name, ytd-video-owner-renderer #text"
+          "ytd-channel-name #text, #owner #channel-name a, ytd-video-owner-renderer #text"
         )?.textContent || "";
-      const hit = textMatchesVideoAi([title, desc, channel, document.title].join("\n"), patterns);
+      const hit = textMatchesVideoAi([title, desc.slice(0, 1500), channel, document.title].join("\n"), patterns);
       if (hit) {
+        // Cover player without nuking the whole YouTube chrome when possible
         const watch =
-          document.querySelector(
-            "#player, #player-container-outer, ytd-watch-flexy, #movie_player, #primary"
-          ) || document.body;
+          document.querySelector("#player-container-outer, #player, #movie_player, ytd-player") ||
+          document.querySelector("#primary-inner") ||
+          document.body;
         markBlocked(watch, `YouTube video: ${hit}`);
       }
     }
@@ -411,25 +473,26 @@
     if (!patterns.length) return;
     const host = hostname();
 
-    // Generic video cards / players on common hosts
     const videoHosts = /(vimeo\.com|dailymotion\.com|tiktok\.com|twitch\.tv|bilibili\.com|rumble\.com)/i;
     if (!videoHosts.test(host)) return;
 
     document
       .querySelectorAll(
-        "article, [data-e2e='feed-video'], .video-card, .shelf-item, .thumb-item, .ClipCard, video"
+        "article, [data-e2e='feed-video'], .video-card, .shelf-item, .thumb-item, .ClipCard, a[href*='/video']"
       )
       .forEach((el) => {
         if (el.classList.contains("nullgen-blocked")) return;
-        const target = el.tagName === "VIDEO" ? el.closest("article, div, section") || el : el;
-        const meta = (
-          target.getAttribute("aria-label") ||
-          target.querySelector("h1, h2, h3, a[title], [data-e2e='video-desc']")?.textContent ||
-          target.textContent ||
-          ""
-        ).slice(0, 500);
+        const meta = [
+          el.getAttribute("aria-label"),
+          el.getAttribute("title"),
+          el.querySelector("h1, h2, h3, a[title], [data-e2e='video-desc']")?.textContent,
+          el.textContent
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .slice(0, 600);
         const hit = textMatchesVideoAi(meta, patterns);
-        if (hit) markBlocked(target, `Video: ${hit}`);
+        if (hit) markBlocked(el, `Video: ${hit}`);
       });
 
     const pageHit = textMatchesVideoAi(document.title, patterns);
@@ -448,16 +511,21 @@
 
   function hookYouTubeSpa() {
     if (!(hostname().includes("youtube") || hostname() === "youtu.be")) return;
-    document.addEventListener("yt-navigate-finish", () => scheduleScan(), true);
-    document.addEventListener("yt-page-data-updated", () => scheduleScan(), true);
-    // History API fallbacks
+    const rescan = () => {
+      scheduleScan();
+      setTimeout(scheduleScan, 300);
+      setTimeout(scheduleScan, 1000);
+      setTimeout(scheduleScan, 2500);
+    };
+    document.addEventListener("yt-navigate-finish", rescan, true);
+    document.addEventListener("yt-page-data-updated", rescan, true);
+    document.addEventListener("yt-action", () => scheduleScan(), true);
     const wrap = (name) => {
       const orig = history[name];
       if (typeof orig !== "function" || orig.__nullgen) return;
       const fn = function (...args) {
         const ret = orig.apply(this, args);
-        setTimeout(scheduleScan, 50);
-        setTimeout(scheduleScan, 400);
+        rescan();
         return ret;
       };
       fn.__nullgen = true;
@@ -465,7 +533,7 @@
     };
     wrap("pushState");
     wrap("replaceState");
-    window.addEventListener("popstate", () => scheduleScan());
+    window.addEventListener("popstate", rescan);
   }
 
   /* ——— CSS selectors ——— */

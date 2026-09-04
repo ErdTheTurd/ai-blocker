@@ -63,10 +63,29 @@ export async function rebuildNetworkRules(settings) {
 
 async function init() {
   let settings = await getSettings();
-  // Ensure defaults are persisted on first run
-  if (!(await chrome.storage.local.get("initialized")).initialized) {
+
+  // v3: stop hard-blocking AI websites by default (use AI freely; filter content elsewhere)
+  const SETTINGS_REV = 3;
+  const stored = await chrome.storage.local.get(["initialized", "settingsRev"]);
+  if (stored.settingsRev !== SETTINGS_REV) {
+    settings.categories.platforms = false;
+    for (const p of settings.platforms || []) p.enabled = false;
+    settings.categories.videos = true;
+    if (!settings.videos) settings.videos = structuredClone(DEFAULT_SETTINGS.videos);
+    else {
+      settings.videos.enabled = true;
+      settings.videos.youtube = true;
+      // merge any new default patterns by id
+      const have = new Set((settings.videos.titlePatterns || []).map((p) => p.id));
+      for (const p of DEFAULT_SETTINGS.videos.titlePatterns) {
+        if (!have.has(p.id)) settings.videos.titlePatterns.push({ ...p });
+      }
+    }
     await saveSettings(settings);
-    await chrome.storage.local.set({ initialized: true, stats: DEFAULT_SETTINGS.stats });
+    await chrome.storage.local.set({ settingsRev: SETTINGS_REV, initialized: true });
+  } else if (!stored.initialized) {
+    await saveSettings(settings);
+    await chrome.storage.local.set({ initialized: true, stats: DEFAULT_SETTINGS.stats, settingsRev: SETTINGS_REV });
   }
 
   const count = await rebuildNetworkRules(settings);

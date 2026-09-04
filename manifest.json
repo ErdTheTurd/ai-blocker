@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Nullgen",
-  "version": "1.1.1",
-  "description": "Block AI platforms, YouTube AI videos, channels, widgets, and AI-written content — customizable like an ad blocker.",
+  "version": "1.2.0",
+  "description": "Hide AI content in feeds and on YouTube — without blocking the AI tools you want to use.",
   "homepage_url": "https://github.com/ErdTheTurd/ai-blocker",
   "permissions": [
     "storage",

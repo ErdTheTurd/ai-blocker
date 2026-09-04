@@ -1,7 +1,7 @@
 import { getSettings, saveSettings, getStats } from "../lib/storage.js";
 
 const CAT_LABELS = {
-  platforms: "AI platforms",
+  platforms: "Hard-block AI sites",
   channels: "Channels / accounts",
   videos: "Videos (YouTube+)",
   selectors: "Widgets & badges",

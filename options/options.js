@@ -8,7 +8,7 @@ import {
 
 const DESCRIPTIONS = {
   appearance: "How blocked content looks across the web.",
-  platforms: "Full sites and AI product domains to hard-block.",
+  platforms: "Optional hard-block of AI websites (off by default — you can still use Claude/ChatGPT).",
   channels: "Creators and accounts to hide wherever they appear.",
   videos: "YouTube and other video feeds — titles, Shorts, watch pages.",
   selectors: "Cosmetic filters — CSS selectors for AI UI chrome.",

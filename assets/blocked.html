@@ -7,16 +7,16 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Manrope:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap"
       rel="stylesheet"
     />
     <style>
       :root {
-        --bg: #0d1014;
-        --surface: #161a20;
-        --accent: #00d4b4;
-        --text: #e8eef2;
-        --muted: #8b98a5;
+        --bg: #06080b;
+        --surface: rgba(16, 22, 30, 0.72);
+        --accent: #1ee0b6;
+        --text: #e9eef5;
+        --muted: #8a96a5;
       }
       * { box-sizing: border-box; margin: 0; padding: 0; }
       body {
@@ -24,59 +24,96 @@
         display: grid;
         place-items: center;
         background:
-          radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 212, 180, 0.18), transparent),
-          radial-gradient(ellipse 60% 40% at 100% 100%, rgba(0, 80, 90, 0.25), transparent),
+          radial-gradient(ellipse 90% 55% at 50% -15%, rgba(30, 224, 182, 0.22), transparent 55%),
+          radial-gradient(ellipse 55% 45% at 100% 100%, rgba(40, 80, 100, 0.28), transparent 50%),
+          radial-gradient(ellipse 40% 35% at 0% 80%, rgba(10, 60, 55, 0.35), transparent 45%),
           var(--bg);
         color: var(--text);
-        font-family: "Space Grotesk", system-ui, sans-serif;
+        font-family: "Manrope", system-ui, sans-serif;
         padding: 2rem;
+        position: relative;
+        overflow: hidden;
+      }
+      body::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        opacity: 0.045;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        pointer-events: none;
       }
       .card {
-        width: min(480px, 100%);
+        position: relative;
+        width: min(520px, 100%);
         text-align: center;
+        padding: 2.5rem 1.75rem;
+        border-radius: 24px;
+        background: var(--surface);
+        border: 1px solid rgba(30, 224, 182, 0.16);
+        backdrop-filter: blur(18px);
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.05),
+          0 30px 80px rgba(0, 0, 0, 0.35);
+        animation: enter 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      @keyframes enter {
+        from { opacity: 0; transform: translateY(14px) scale(0.98); }
+        to { opacity: 1; transform: none; }
       }
       .mark {
-        width: 64px;
-        height: 64px;
-        margin: 0 auto 1.5rem;
-        border: 3px solid var(--accent);
+        width: 72px;
+        height: 72px;
+        margin: 0 auto 1.4rem;
+        border: 2px solid var(--accent);
         border-radius: 50%;
         position: relative;
+        background: linear-gradient(145deg, rgba(30, 224, 182, 0.14), transparent 60%);
+        box-shadow: 0 0 0 8px rgba(30, 224, 182, 0.07);
+        animation: mark-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
       }
       .mark::after {
         content: "";
         position: absolute;
-        inset: 45% -8%;
-        height: 3px;
+        inset: 46% -10%;
+        height: 2px;
         background: var(--accent);
-        transform: rotate(-45deg);
+        transform: rotate(-42deg);
+        box-shadow: 0 0 12px rgba(30, 224, 182, 0.55);
       }
-      h1 {
-        font-size: clamp(1.75rem, 4vw, 2.25rem);
-        font-weight: 700;
-        letter-spacing: -0.03em;
-        margin-bottom: 0.5rem;
+      @keyframes mark-in {
+        from { opacity: 0; transform: scale(0.85) rotate(-8deg); }
+        to { opacity: 1; transform: none; }
       }
       .brand {
         color: var(--accent);
-        font-family: "JetBrains Mono", monospace;
-        font-size: 0.85rem;
-        letter-spacing: 0.12em;
+        font-family: "Syne", sans-serif;
+        font-weight: 700;
+        font-size: 0.95rem;
+        letter-spacing: 0.22em;
         text-transform: uppercase;
-        margin-bottom: 1rem;
+        margin-bottom: 0.85rem;
+      }
+      h1 {
+        font-family: "Syne", sans-serif;
+        font-size: clamp(2rem, 5vw, 2.75rem);
+        font-weight: 800;
+        letter-spacing: -0.045em;
+        margin-bottom: 0.55rem;
+        line-height: 1.05;
       }
       p {
         color: var(--muted);
-        line-height: 1.55;
-        margin-bottom: 1.75rem;
+        line-height: 1.6;
+        margin-bottom: 1.6rem;
+        font-size: 1.02rem;
       }
       .host {
-        font-family: "JetBrains Mono", monospace;
+        font-family: "IBM Plex Mono", monospace;
         color: var(--text);
-        background: var(--surface);
-        padding: 0.65rem 1rem;
-        border-radius: 8px;
-        border: 1px solid rgba(0, 212, 180, 0.2);
+        background: rgba(6, 8, 11, 0.55);
+        padding: 0.85rem 1.1rem;
+        border-radius: 12px;
+        border: 1px solid rgba(30, 224, 182, 0.18);
         word-break: break-all;
         margin-bottom: 1.75rem;
         font-size: 0.9rem;
@@ -92,23 +129,28 @@
         border: none;
         cursor: pointer;
         font: inherit;
-        padding: 0.7rem 1.15rem;
-        border-radius: 8px;
+        font-weight: 700;
+        padding: 0.8rem 1.25rem;
+        border-radius: 12px;
         text-decoration: none;
         display: inline-flex;
         align-items: center;
         gap: 0.4rem;
+        transition: transform 0.15s ease, filter 0.15s ease;
       }
       .primary {
-        background: var(--accent);
-        color: #041412;
-        font-weight: 600;
+        background: linear-gradient(135deg, #23ecc2, #12b894);
+        color: #04140f;
+        box-shadow: 0 12px 28px rgba(18, 184, 148, 0.25);
       }
+      .primary:hover { filter: brightness(1.05); transform: translateY(-1px); }
       .ghost {
         background: transparent;
         color: var(--muted);
-        border: 1px solid rgba(139, 152, 165, 0.35);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        font-weight: 600;
       }
+      .ghost:hover { color: var(--text); border-color: rgba(255, 255, 255, 0.18); }
     </style>
   </head>
   <body>

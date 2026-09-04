@@ -90,7 +90,7 @@ function updatePreview() {
   const a = settings.appearance;
   const root = document.documentElement;
   const presets = {
-    signal: { accent: "#00d4b4", surface: "#161a20", text: "#e8eef2" },
+    signal: { accent: "#1ee0b6", surface: "#0c1016", text: "#e9eef5" },
     paper: { accent: "#0b6e4f", surface: "#f3efe6", text: "#1a1f24" },
     terminal: { accent: "#7CFF9E", surface: "#0a0f0c", text: "#c8f5d4" }
   };

@@ -26,6 +26,7 @@
           <button type="button" class="nav-btn active" data-panel="appearance">Appearance</button>
           <button type="button" class="nav-btn" data-panel="platforms">Platforms</button>
           <button type="button" class="nav-btn" data-panel="channels">Channels</button>
+          <button type="button" class="nav-btn" data-panel="videos">Videos</button>
           <button type="button" class="nav-btn" data-panel="selectors">Selectors</button>
           <button type="button" class="nav-btn" data-panel="keywords">Keywords</button>
           <button type="button" class="nav-btn" data-panel="aitext">AI text</button>
@@ -150,6 +151,50 @@
             <button type="button" class="btn" id="add-channel">Add</button>
           </div>
           <div class="list" id="channel-list"></div>
+        </section>
+
+        <!-- Videos -->
+        <section class="panel" id="panel-videos">
+          <p class="hint">
+            Hide AI videos on YouTube (home, search, related, Shorts, watch pages) and other video sites
+            when titles/descriptions match your patterns.
+          </p>
+          <div class="grid-2">
+            <div class="field">
+              <label class="check">
+                <input type="checkbox" id="videos-enabled" />
+                Enable video filtering
+              </label>
+              <label class="check">
+                <input type="checkbox" id="videos-youtube" />
+                YouTube (including Shorts)
+              </label>
+              <label class="check">
+                <input type="checkbox" id="videos-other" />
+                Other video sites (TikTok, Vimeo, …)
+              </label>
+            </div>
+            <div class="field">
+              <label class="check">
+                <input type="checkbox" id="videos-feed" />
+                Block feed / search / related cards
+              </label>
+              <label class="check">
+                <input type="checkbox" id="videos-watch" />
+                Block matching watch pages
+              </label>
+              <label class="check">
+                <input type="checkbox" id="videos-shorts" />
+                Block matching Shorts
+              </label>
+            </div>
+          </div>
+          <div class="toolbar">
+            <input type="text" id="video-pattern-input" placeholder="Regex, e.g. \\bSora\\b" />
+            <input type="text" id="video-pattern-label" placeholder="Label" />
+            <button type="button" class="btn" id="add-video-pattern">Add pattern</button>
+          </div>
+          <div class="list" id="video-pattern-list"></div>
         </section>
 
         <!-- Selectors -->

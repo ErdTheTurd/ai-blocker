@@ -7,18 +7,19 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Manrope:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="popup.css" />
   </head>
   <body>
+    <div class="aura" aria-hidden="true"></div>
     <header class="head">
       <div class="brand">
         <span class="logo" aria-hidden="true"></span>
         <div>
           <strong>Nullgen</strong>
-          <span class="tag">AI signal filter</span>
+          <span class="tag">Signal filter</span>
         </div>
       </div>
       <label class="switch" title="Master toggle">
@@ -30,23 +31,24 @@
     <section class="stats">
       <div>
         <span class="num" id="stat-elements">0</span>
-        <span class="lbl">elements</span>
+        <span class="lbl">Elements</span>
       </div>
       <div>
         <span class="num" id="stat-text">0</span>
-        <span class="lbl">text</span>
+        <span class="lbl">Text</span>
       </div>
       <div>
         <span class="num" id="stat-nav">0</span>
-        <span class="lbl">sites</span>
+        <span class="lbl">Sites</span>
       </div>
     </section>
 
+    <p class="section-label">Filters</p>
     <section class="cats" id="categories"></section>
 
     <footer class="foot">
-      <button type="button" class="link" id="allow-site">Allow this site</button>
-      <button type="button" class="link primary" id="open-options">Customize</button>
+      <button type="button" class="ghost-btn" id="allow-site">Allow site</button>
+      <button type="button" class="solid-btn" id="open-options">Customize</button>
     </footer>
     <script type="module" src="popup.js"></script>
   </body>

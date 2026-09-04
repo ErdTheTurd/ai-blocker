@@ -3,6 +3,7 @@ import { getSettings, saveSettings, getStats } from "../lib/storage.js";
 const CAT_LABELS = {
   platforms: "AI platforms",
   channels: "Channels / accounts",
+  videos: "Videos (YouTube+)",
   selectors: "Widgets & badges",
   keywords: "Keywords",
   aiText: "AI-written text",

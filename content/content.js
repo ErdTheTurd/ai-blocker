@@ -180,39 +180,75 @@
   }
 
   /* ——— Channels (YouTube / X / Twitch) ——— */
+  function normalizeHandle(match) {
+    return String(match || "")
+      .replace(/^@/, "")
+      .replace(/^https?:\/\/(www\.)?(youtube\.com|youtu\.be)\//i, "")
+      .replace(/^channel\//i, "")
+      .replace(/^@/, "")
+      .split(/[/?#]/)[0]
+      .toLowerCase();
+  }
+
+  function youtubeCardFrom(node) {
+    return (
+      node.closest(
+        [
+          "ytd-video-renderer",
+          "ytd-rich-item-renderer",
+          "ytd-grid-video-renderer",
+          "ytd-compact-video-renderer",
+          "ytd-playlist-panel-video-renderer",
+          "ytd-reel-item-renderer",
+          "ytd-short",
+          "ytd-rich-grid-media",
+          "ytd-watch-card-compact-video-renderer",
+          "ytm-video-with-context-renderer",
+          "ytm-rich-item-renderer"
+        ].join(", ")
+      ) || node
+    );
+  }
+
   function scanChannels() {
     if (!settings.categories.channels) return;
     const path = location.pathname + location.search;
     const host = hostname();
 
     const yt = settings.channels?.youtube || [];
-    if (host.includes("youtube.com") || host === "youtu.be") {
+    if (host.includes("youtube.com") || host === "youtu.be" || host === "m.youtube.com") {
       for (const ch of yt) {
         if (!ch.enabled || !ch.match) continue;
-        const needle = ch.match.replace(/^@/, "").toLowerCase();
+        const needle = normalizeHandle(ch.match);
+        if (!needle) continue;
         const hay = (path + " " + document.title).toLowerCase();
         if (
           hay.includes("/@" + needle) ||
           hay.includes("channel/" + needle) ||
-          hay.includes(ch.match.toLowerCase())
+          hay.includes("/c/" + needle) ||
+          hay.includes("/user/" + needle)
         ) {
-          // Channel page — soft-block main content
           const primary =
-            document.querySelector("#page-manager, ytd-browse, ytd-two-column-browse-results-renderer") ||
-            document.body;
+            document.querySelector(
+              "#page-manager, ytd-browse, ytd-two-column-browse-results-renderer, ytd-watch-flexy"
+            ) || document.body;
           markBlocked(primary, `YouTube channel: ${ch.label || ch.match}`);
         }
-        // Video cards / links
-        document.querySelectorAll("a[href*='/@'], a[href*='/channel/'], ytd-channel-name").forEach((node) => {
-          const text = (node.getAttribute("href") || node.textContent || "").toLowerCase();
-          if (text.includes(needle) || text.includes(ch.match.toLowerCase())) {
-            const card =
-              node.closest(
-                "ytd-video-renderer, ytd-rich-item-renderer, ytd-grid-video-renderer, ytd-compact-video-renderer, ytd-playlist-panel-video-renderer"
-              ) || node;
-            markBlocked(card, `Channel: ${ch.label || ch.match}`);
-          }
-        });
+
+        document
+          .querySelectorAll(
+            "a[href*='/@'], a[href*='/channel/'], a[href*='/c/'], a[href*='/user/'], ytd-channel-name, #channel-name, #text.ytd-channel-name"
+          )
+          .forEach((node) => {
+            const text = (
+              node.getAttribute("href") ||
+              node.getAttribute("title") ||
+              node.textContent ||
+              ""
+            ).toLowerCase();
+            if (!text.includes(needle) && !text.includes(ch.match.toLowerCase())) return;
+            markBlocked(youtubeCardFrom(node), `Channel: ${ch.label || ch.match}`);
+          });
       }
     }
 
@@ -221,11 +257,10 @@
       for (const ch of tw) {
         if (!ch.enabled || !ch.match) continue;
         const handle = ch.match.replace(/^@/, "").toLowerCase();
-        document.querySelectorAll('a[href*="/"]').forEach((a) => {
+        document.querySelectorAll("a[href*='/']").forEach((a) => {
           const href = (a.getAttribute("href") || "").toLowerCase();
           if (href === "/" + handle || href.startsWith("/" + handle + "/")) {
-            const article = a.closest("article") || a;
-            markBlocked(article, `Account: @${handle}`);
+            markBlocked(a.closest("article") || a, `Account: @${handle}`);
           }
         });
       }
@@ -243,6 +278,194 @@
         /* bad regex */
       }
     }
+  }
+
+  /* ——— Videos (YouTube-first, works on other video sites too) ——— */
+  function videoTitlePatterns() {
+    return (settings.videos?.titlePatterns || [])
+      .filter((p) => p.enabled && p.pattern)
+      .map((p) => {
+        try {
+          return { rule: p, re: new RegExp(p.pattern, "i") };
+        } catch {
+          return null;
+        }
+      })
+      .filter(Boolean);
+  }
+
+  function textMatchesVideoAi(text, patterns) {
+    if (!text) return null;
+    for (const { rule, re } of patterns) {
+      re.lastIndex = 0;
+      if (re.test(text)) return rule.label || rule.pattern;
+    }
+    return null;
+  }
+
+  function scanYouTubeVideos() {
+    const v = settings.videos || {};
+    if (!v.youtube) return;
+    const patterns = videoTitlePatterns();
+    if (!patterns.length) return;
+
+    const host = hostname();
+    if (!(host.includes("youtube.com") || host === "youtu.be" || host === "m.youtube.com")) {
+      return;
+    }
+
+    // Feed / search / related / home cards
+    if (v.blockFeedCards !== false) {
+      const cards = document.querySelectorAll(
+        [
+          "ytd-rich-item-renderer",
+          "ytd-video-renderer",
+          "ytd-grid-video-renderer",
+          "ytd-compact-video-renderer",
+          "ytd-playlist-panel-video-renderer",
+          "ytd-reel-item-renderer",
+          "ytd-rich-grid-media",
+          "ytm-rich-item-renderer",
+          "ytm-video-with-context-renderer"
+        ].join(", ")
+      );
+      cards.forEach((card) => {
+        if (card.classList.contains("nullgen-blocked")) return;
+        const titleEl =
+          card.querySelector(
+            "#video-title, #video-title-link, a#video-title, h3, .title, yt-formatted-string#video-title"
+          ) || card;
+        const meta = [
+          titleEl.getAttribute("title"),
+          titleEl.getAttribute("aria-label"),
+          titleEl.textContent,
+          card.querySelector("#description-text, #subtitle, #metadata")?.textContent
+        ]
+          .filter(Boolean)
+          .join(" \n ");
+        const hit = textMatchesVideoAi(meta, patterns);
+        if (hit) markBlocked(card, `YouTube: ${hit}`);
+      });
+    }
+
+    // Shorts shelf / player
+    if (v.blockShorts !== false) {
+      document
+        .querySelectorAll(
+          "ytd-reel-video-renderer, ytd-shorts, shorts-video-renderer, ytd-player[is-shorts]"
+        )
+        .forEach((el) => {
+          const meta = (
+            el.getAttribute("aria-label") ||
+            el.querySelector("h2, #video-title, .title")?.textContent ||
+            document.title ||
+            ""
+          ).trim();
+          const hit = textMatchesVideoAi(meta, patterns);
+          if (hit) markBlocked(el.closest("ytd-reel-video-renderer, ytd-shorts") || el, `Shorts: ${hit}`);
+        });
+
+      if (/\/shorts\//i.test(location.pathname)) {
+        const hit = textMatchesVideoAi(document.title + " " + (document.body?.innerText || "").slice(0, 2000), patterns);
+        if (hit) {
+          const player =
+            document.querySelector("#shorts-player, ytd-reel-video-renderer, #player") ||
+            document.querySelector("ytd-app") ||
+            document.body;
+          markBlocked(player, `Shorts: ${hit}`);
+        }
+      }
+    }
+
+    // Watch page — block the main player/watch layout when the current video matches
+    if (v.blockWatchPage !== false && (/\/watch/.test(location.pathname) || host === "youtu.be")) {
+      const title =
+        document.querySelector(
+          "h1.ytd-watch-metadata yt-formatted-string, h1 yt-formatted-string, #title h1, ytd-watch-metadata #title"
+        )?.textContent ||
+        document.querySelector('meta[name="title"]')?.content ||
+        document.title.replace(/ - YouTube$/i, "");
+      const desc =
+        document.querySelector(
+          "#description-inline-expander, #description, ytd-expander#description, #info-container"
+        )?.innerText || "";
+      const channel =
+        document.querySelector(
+          "ytd-channel-name #text, #owner #channel-name, ytd-video-owner-renderer #text"
+        )?.textContent || "";
+      const hit = textMatchesVideoAi([title, desc, channel, document.title].join("\n"), patterns);
+      if (hit) {
+        const watch =
+          document.querySelector(
+            "#player, #player-container-outer, ytd-watch-flexy, #movie_player, #primary"
+          ) || document.body;
+        markBlocked(watch, `YouTube video: ${hit}`);
+      }
+    }
+  }
+
+  function scanOtherVideoSites() {
+    const v = settings.videos || {};
+    if (!v.otherSites) return;
+    const patterns = videoTitlePatterns();
+    if (!patterns.length) return;
+    const host = hostname();
+
+    // Generic video cards / players on common hosts
+    const videoHosts = /(vimeo\.com|dailymotion\.com|tiktok\.com|twitch\.tv|bilibili\.com|rumble\.com)/i;
+    if (!videoHosts.test(host)) return;
+
+    document
+      .querySelectorAll(
+        "article, [data-e2e='feed-video'], .video-card, .shelf-item, .thumb-item, .ClipCard, video"
+      )
+      .forEach((el) => {
+        if (el.classList.contains("nullgen-blocked")) return;
+        const target = el.tagName === "VIDEO" ? el.closest("article, div, section") || el : el;
+        const meta = (
+          target.getAttribute("aria-label") ||
+          target.querySelector("h1, h2, h3, a[title], [data-e2e='video-desc']")?.textContent ||
+          target.textContent ||
+          ""
+        ).slice(0, 500);
+        const hit = textMatchesVideoAi(meta, patterns);
+        if (hit) markBlocked(target, `Video: ${hit}`);
+      });
+
+    const pageHit = textMatchesVideoAi(document.title, patterns);
+    if (pageHit) {
+      const main =
+        document.querySelector("main, #root, .video-player, .player") || document.body;
+      markBlocked(main, `Video page: ${pageHit}`);
+    }
+  }
+
+  function scanVideos() {
+    if (!settings.categories.videos || !settings.videos?.enabled) return;
+    scanYouTubeVideos();
+    scanOtherVideoSites();
+  }
+
+  function hookYouTubeSpa() {
+    if (!(hostname().includes("youtube") || hostname() === "youtu.be")) return;
+    document.addEventListener("yt-navigate-finish", () => scheduleScan(), true);
+    document.addEventListener("yt-page-data-updated", () => scheduleScan(), true);
+    // History API fallbacks
+    const wrap = (name) => {
+      const orig = history[name];
+      if (typeof orig !== "function" || orig.__nullgen) return;
+      const fn = function (...args) {
+        const ret = orig.apply(this, args);
+        setTimeout(scheduleScan, 50);
+        setTimeout(scheduleScan, 400);
+        return ret;
+      };
+      fn.__nullgen = true;
+      history[name] = fn;
+    };
+    wrap("pushState");
+    wrap("replaceState");
+    window.addEventListener("popstate", () => scheduleScan());
   }
 
   /* ——— CSS selectors ——— */
@@ -432,6 +655,7 @@
     if (!settings?.enabled || isAllowlisted()) return;
     if (!document.body) return;
     scanChannels();
+    scanVideos();
     scanSelectors();
     scanEmbeds();
     scanImages();
@@ -484,9 +708,12 @@
     if (document.body) run();
     else document.addEventListener("DOMContentLoaded", run, { once: true });
 
+    hookYouTubeSpa();
+
     // YouTube / SPAs settle late
     setTimeout(scheduleScan, 800);
     setTimeout(scheduleScan, 2000);
+    setTimeout(scheduleScan, 5000);
   }
 
   chrome.storage.onChanged.addListener((changes, area) => {

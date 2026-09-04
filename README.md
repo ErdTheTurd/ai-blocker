@@ -30,17 +30,22 @@ bash scripts/build-zip.sh   # creates dist/nullgen-chrome.zip
 
 ## Make it available worldwide
 
-Publishing to the **Chrome Web Store** (Public + All regions) is how everyone on Earth with Chrome can install it. Step-by-step:
+Publishing to the **Chrome Web Store** (Public + All regions) is how everyone with Chrome can install it.
+
+**Just you:** Load unpacked (no store) — see PUBLISH.md section A  
+**Everyone:** Store → Public + All regions — see PUBLISH.md section B
 
 → **[PUBLISH.md](./PUBLISH.md)**
 
-Includes developer account setup, ZIP upload, listing copy, screenshots, privacy policy (`privacy.html`), and worldwide distribution settings.
+Includes developer account setup, ZIP upload, listing copy, screenshots, privacy policy (`privacy.html`), and private/unlisted/public options.
+
 
 ## What it blocks
 
 | Category | Behavior |
 |---|---|
 | **Platforms** | Hard-blocks AI sites via `declarativeNetRequest` |
+| **Videos** | YouTube home/search/related/Shorts/watch + other video sites |
 | **Channels** | Hides YouTube / X / Twitch creators you list |
 | **Selectors** | Cosmetic CSS filters for AI UI chrome |
 | **Keywords** | Regex match → block nearest article / comment |

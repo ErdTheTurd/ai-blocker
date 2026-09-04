@@ -1,15 +1,16 @@
 Name: Nullgen
-Short description: Block AI platforms, channels, widgets, and AI-written content — customizable like an ad blocker.
+Short description: Block AI platforms, YouTube AI videos, channels, widgets, and AI-written content.
 Category: Productivity
 Language: English
-Visibility: Public
-Regions: All regions
+Visibility: Public (everyone) OR Unlisted/Private (just you / invited people)
+Regions: All regions (for worldwide)
 
 Detailed description:
 Nullgen filters AI noise from the web the way an ad blocker filters ads.
 
 • Block AI platforms (ChatGPT, Claude, Gemini, Midjourney, and more)
-• Hide creators/channels you list on YouTube, X, and Twitch
+• Hide AI videos on YouTube — home, search, related, Shorts, and watch pages
+• Block creators/channels you list on YouTube, X, and Twitch
 • Cosmetic filters for AI badges, sidebars, and embeds
 • Keyword and AI-text heuristics for generated copy
 • AI image CDN / alt-text matching

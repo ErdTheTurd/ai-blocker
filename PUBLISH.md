@@ -1,37 +1,29 @@
 # How to install & publish Nullgen
 
-Chrome extensions are not iPhone “App Store” apps. For Chrome, the store is the
-**Chrome Web Store**. Below: **just you** vs **everyone**.
+Nullgen is a Chromium extension. It is live on **Microsoft Edge Add-ons**.
+
+**Public listing (everyone):**  
+https://microsoftedge.microsoft.com/addons/detail/nullgen-ai-blocker/omekfbkiookjfkmddmnjjlfogdmlekji
 
 ---
 
-## A) Just for me (fastest — no review)
+## A) Just for me (no store)
 
-Use this while developing or if only you need Nullgen.
-
-### Option A1 — Load unpacked (recommended for you alone)
+### Edge — Load unpacked
 
 1. Download this repo (or `dist/nullgen-chrome.zip` and unzip it)
-2. Open Chrome → `chrome://extensions`
-3. Turn on **Developer mode** (top right)
+2. Open Edge → paste `edge://extensions` → Enter
+3. Turn **Developer mode** ON
 4. Click **Load unpacked**
 5. Select the folder that contains `manifest.json`
 
-Only your browser gets it. Nobody else can find it in the store.
+Only your browser gets it.
 
-### Option A2 — Chrome Web Store “Unlisted” or “Private”
+### Chrome — Load unpacked (optional)
 
-Still uses the store dashboard, but not publicly searchable:
+Same steps with `chrome://extensions`.
 
-1. Create a [Developer account](https://chrome.google.com/webstore/devconsole) (one-time ~$5)
-2. **New item** → upload `dist/nullgen-chrome.zip`
-3. Fill listing + privacy policy URL (`privacy.html`)
-4. On **Distribution**:
-   - **Unlisted** — anyone with the link can install; not in search
-   - **Private** — only accounts/groups you list (Google Groups) can install
-5. Submit for review (still required, but visibility stays limited)
-
-Rebuild the zip anytime:
+Rebuild the package anytime:
 
 ```bash
 bash scripts/build-zip.sh
@@ -40,62 +32,84 @@ bash scripts/build-zip.sh
 
 ---
 
-## B) Everyone around the world (public)
+## B) Everyone — Microsoft Edge Add-ons (live)
 
-1. Same developer account + upload `dist/nullgen-chrome.zip`
-2. Complete Store listing (see `store/listing.txt`) and upload screenshots from `store/screenshots/`
-3. Privacy tab → link to hosted `privacy.html`
-4. **Distribution** tab:
-   - Visibility: **Public**
-   - Regions: **All regions**
-5. **Submit for review**
+Public install link:
 
-When Google approves it, anyone with Chrome can install from:
+```text
+https://microsoftedge.microsoft.com/addons/detail/nullgen-ai-blocker/omekfbkiookjfkmddmnjjlfogdmlekji
+```
 
-`https://chromewebstore.google.com/…`
+Share that URL. Anyone on Edge can click **Get** / **Install**.
 
-That is the only way it appears for “everyone” like a normal extension.
+### Visibility options in Partner Center
 
-| Goal | What to choose |
+| Goal | Partner Center setting |
 |---|---|
-| Only me, right now | Load unpacked |
-| Only me / friends with a link | Store → **Unlisted** |
-| Only my team/emails | Store → **Private** |
-| Whole world | Store → **Public** + **All regions** |
+| Whole world (current) | **Public** listing |
+| Only people with the link | **Hidden** / unlisted (if offered) |
+| Limited testers | Use a private/test distribution if available in your dashboard |
+
+---
+
+## C) Ship an update to Microsoft
+
+1. Bump `"version"` in `manifest.json` (must increase)
+2. Run `bash scripts/build-zip.sh`
+3. Open [Partner Center](https://partner.microsoft.com/dashboard) → **Edge** → your Nullgen listing
+4. Upload the new `dist/nullgen-chrome.zip`
+5. Refresh listing text from `store/listing.txt` if needed
+6. Confirm privacy policy URL still points at your hosted `privacy.html` (or https://nullgen.ai/privacy)
+7. Submit for certification / review
+
+When Microsoft approves the update, the same public Edge link serves the new version.
+
+---
+
+## D) Chrome Web Store (optional second store)
+
+Same ZIP works for Chrome:
+
+1. [Chrome Web Store Developer Dashboard](https://chrome.google.com/webstore/devconsole)
+2. Upload `dist/nullgen-chrome.zip`
+3. Distribution → **Public** + **All regions** for worldwide Chrome users
+
+Not required if Edge is your primary store.
 
 ---
 
 ## Store listing (copy/paste)
 
-**Name:** Nullgen  
+See `store/listing.txt`.
+
+**Name:** Nullgen AI Blocker  
 
 **Short description:**  
-Block AI platforms, channels, YouTube AI videos, widgets, and AI-written content.
-
-**Detailed description:** see `store/listing.txt`
+Hide AI content in feeds and on YouTube — without blocking the AI tools you want to use.
 
 **Category:** Productivity  
 
-**Privacy policy:** host `privacy.html` (GitHub Pages or your site)
+**Privacy policy:** host `privacy.html`, or use your live policy URL.
 
 ---
 
 ## YouTube / video filtering
 
-In Options → **Videos**:
+Options → **Videos**:
 
 - Toggle YouTube feed cards, watch pages, Shorts
-- Edit title/description regex patterns (Sora, Midjourney, “AI-generated”, …)
-- Options → **Channels** → add `@handles` to hide whole creators
+- Edit title/description patterns
+- Options → **Channels** → add `@handles` to hide creators
 
-Popup → enable **Videos (YouTube+)**.
+Popup → keep **Videos (YouTube+)** ON.  
+Leave **Hard-block AI sites** OFF unless you want to ban visiting Claude/ChatGPT entirely.
 
 ---
 
 ## Where is `manifest.json`?
 
-Repo root on `main`:
+Repo root:
 
 https://github.com/ErdTheTurd/ai-blocker/blob/main/manifest.json
 
-Also inside `dist/nullgen-chrome.zip` at the ZIP root (required for store upload).
+Also at the root of `dist/nullgen-chrome.zip` (required for Edge/Chrome upload).

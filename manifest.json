@@ -1,9 +1,9 @@
 {
   "manifest_version": 3,
   "name": "Nullgen",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Hide AI content in feeds and on YouTube — without blocking the AI tools you want to use.",
-  "homepage_url": "https://github.com/ErdTheTurd/ai-blocker",
+  "homepage_url": "https://microsoftedge.microsoft.com/addons/detail/nullgen-ai-blocker/omekfbkiookjfkmddmnjjlfogdmlekji",
   "permissions": [
     "storage",
     "declarativeNetRequest",

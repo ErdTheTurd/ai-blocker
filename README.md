@@ -1,50 +1,44 @@
 # Nullgen
 
-Chrome extension that blocks AI the way an ad blocker blocks ads — platforms, channels, widgets, keywords, AI images, and likely AI-written text. Everything is customizable: what gets blocked and how blocked content looks.
+Browser extension that filters AI the way an ad blocker filters ads — YouTube AI videos, channels, widgets, keywords, AI images, and AI-written text. Customize what gets blocked and how it looks.
 
-## Find `manifest.json`
+## Install (Microsoft Edge)
 
-It is in the **root of this repo**:
+Nullgen is published on **Microsoft Edge Add-ons**:
 
-```
-manifest.json
-```
+**https://microsoftedge.microsoft.com/addons/detail/nullgen-ai-blocker/omekfbkiookjfkmddmnjjlfogdmlekji**
 
-Direct link on the extension branch:
+1. Open that link in **Microsoft Edge**
+2. Click **Get** / **Install**
+3. Confirm
 
-https://github.com/ErdTheTurd/ai-blocker/blob/cursor/nullgen-ai-blocker-extension-14e5/manifest.json
+That is the public install for everyone.
 
-> If you are looking at the default `main` branch before merging the PR, you will not see the extension files yet. Open the PR branch above or merge [PR #1](https://github.com/ErdTheTurd/ai-blocker/pull/1).
+## Install for yourself only (unpacked)
 
-## Install for yourself (unpacked)
+Use this for local testing in Edge or Chrome:
 
-1. Download / clone this repo (PR branch or merged `main`)
-2. Chrome → `chrome://extensions` → enable **Developer mode**
-3. **Load unpacked** → select the folder that contains `manifest.json`
+1. Download / clone this repo (`main`)
+2. Edge → `edge://extensions` (or Chrome → `chrome://extensions`)
+3. Enable **Developer mode**
+4. **Load unpacked** → select the folder that contains `manifest.json`
 
-Or use the prebuilt zip (extract it, then Load unpacked on the extracted folder):
+Or build the zip:
 
 ```bash
 bash scripts/build-zip.sh   # creates dist/nullgen-chrome.zip
 ```
 
-## Make it available worldwide
+Unzip it, then Load unpacked on the extracted folder.
 
-Publishing to the **Chrome Web Store** (Public + All regions) is how everyone with Chrome can install it.
+## Publish / update on Microsoft
 
-**Just you:** Load unpacked (no store) — see PUBLISH.md section A  
-**Everyone:** Store → Public + All regions — see PUBLISH.md section B
+See **[PUBLISH.md](./PUBLISH.md)** for Partner Center steps (just you vs public, and how to ship updates).
 
-→ **[PUBLISH.md](./PUBLISH.md)**
-
-Includes developer account setup, ZIP upload, listing copy, screenshots, privacy policy (`privacy.html`), and private/unlisted/public options.
-
-
-## What it blocks
+## What it filters
 
 | Category | Behavior |
 |---|---|
-| **Platforms** | Hard-blocks AI sites via `declarativeNetRequest` |
 | **Videos** | YouTube home/search/related/Shorts/watch + other video sites |
 | **Channels** | Hides YouTube / X / Twitch creators you list |
 | **Selectors** | Cosmetic CSS filters for AI UI chrome |
@@ -52,6 +46,7 @@ Includes developer account setup, ZIP upload, listing copy, screenshots, privacy
 | **AI text** | Heuristics for common LLM phrases & structure |
 | **Images** | AI CDN hosts + “AI-generated” alt text |
 | **Embeds** | Iframes pointing at AI products |
+| **Platforms** | Optional hard-block of AI websites (off by default so you can still use Claude/ChatGPT) |
 
 ## Customize
 
@@ -61,7 +56,7 @@ Includes developer account setup, ZIP upload, listing copy, screenshots, privacy
 ## Project layout
 
 ```
-manifest.json                 ← Chrome entry point (repo root)
+manifest.json                 ← extension entry (repo root)
 background/service-worker.js
 content/
 popup/
@@ -69,10 +64,10 @@ options/
 lib/
 assets/
 icons/
-dist/nullgen-chrome.zip       ← store / share package
-store/                        ← Web Store screenshots & promo art
+dist/nullgen-chrome.zip       ← Edge / Chromium store package
+store/                        ← store screenshots & promo art
 privacy.html                  ← privacy policy page
-PUBLISH.md                    ← worldwide publishing guide
+PUBLISH.md                    ← Edge publish / update guide
 scripts/build-zip.sh
 ```
 
@@ -80,5 +75,6 @@ scripts/build-zip.sh
 
 - AI-text detection is heuristic — tune sensitivity in Options.
 - Channel lists ship mostly empty; add the creators you care about.
-- Settings live in `chrome.storage.local`.
+- Settings live in `chrome.storage.local` (works in Edge).
 - “Show anyway” reveals one blocked element for the current page session.
+- AI tool sites (Claude, ChatGPT, etc.) are not hard-blocked by default.

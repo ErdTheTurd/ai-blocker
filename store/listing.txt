@@ -1,25 +1,28 @@
-Name: Nullgen
-Short description: Block AI platforms, YouTube AI videos, channels, widgets, and AI-written content.
+Name: Nullgen AI Blocker
+Short description: Hide AI content in feeds and on YouTube — without blocking the AI tools you want to use.
 Category: Productivity
 Language: English
-Visibility: Public (everyone) OR Unlisted/Private (just you / invited people)
-Regions: All regions (for worldwide)
+Store: Microsoft Edge Add-ons (primary)
+Public URL: https://microsoftedge.microsoft.com/addons/detail/nullgen-ai-blocker/omekfbkiookjfkmddmnjjlfogdmlekji
+Visibility: Public
+Regions: All available regions
 
 Detailed description:
-Nullgen filters AI noise from the web the way an ad blocker filters ads.
+Nullgen filters AI noise from the web the way an ad blocker filters ads — while still letting you use AI tools when you choose.
 
-• Block AI platforms (ChatGPT, Claude, Gemini, Midjourney, and more)
 • Hide AI videos on YouTube — home, search, related, Shorts, and watch pages
 • Block creators/channels you list on YouTube, X, and Twitch
 • Cosmetic filters for AI badges, sidebars, and embeds
 • Keyword and AI-text heuristics for generated copy
 • AI image CDN / alt-text matching
+• Optional hard-block of AI websites (off by default so Claude/ChatGPT still work)
 • Fully customizable appearance and rule lists
 • Allowlist any site in one click
 • Import / export your configuration
 
 All filtering runs in your browser. Nullgen does not sell your data.
 
-Privacy policy: privacy.html (host via GitHub Pages after merge)
+Install (Edge): https://microsoftedge.microsoft.com/addons/detail/nullgen-ai-blocker/omekfbkiookjfkmddmnjjlfogdmlekji
+Privacy policy: privacy.html (or your hosted policy URL)
 Screenshots: store/screenshots/
 Promo: store/promo/
